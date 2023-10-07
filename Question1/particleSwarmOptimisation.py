@@ -25,7 +25,7 @@ class ParticleSwarmOptimization:
         # generate particles and give them one character labels
         self.particles = [Particle(self, chr(index + 65)) for index in range(population_size)]
 
-    def __perform_an_iteration(self, verbose):
+    def __perform_an_iteration(self, verbose: bool):
         # private
         for particle in self.particles:
             current_fitness = particle.get_fitness_and_update_personal_best()

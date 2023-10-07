@@ -2,7 +2,7 @@ import numpy as np
 
 
 class Problem:
-    """ A generic class for representing problems,
+    """ A generic abstract class for representing problems,
     for which solutions are vectors and fitness can be represented as a scalar """
 
     def __init__(self, number_of_dimensions):
