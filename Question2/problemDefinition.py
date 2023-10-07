@@ -12,6 +12,11 @@ class BinaryVectorProblemWithMutationScheme(ProblemWithMutationScheme):
     def generate_random_solution(self) -> np.ndarray:
         return np.random.randint(0, 2, size=self.number_of_dimensions)
 
+    def mutate_solution(self, solution: np.ndarray) -> np.ndarray:
+        index_to_swap = np.random.randint(0, self.number_of_dimensions, 1)[0]
+        solution[index_to_swap] = 1 - solution[index_to_swap]  # swaps the binary value
+        return solution
+
 
 class SumpleteProblem(BinaryVectorProblemWithMutationScheme):
     """ Class for the Sumplete Problem, this uses the more robust fitness method from subtask b """
@@ -35,10 +40,6 @@ class SumpleteProblem(BinaryVectorProblemWithMutationScheme):
 
         # because we are minimising the error we multiply by -1
         return (np.sum(row_wise_errors_squared) + np.sum(column_wise_errors_squared)) * -1
-
-    def mutate_solution(self, solution: np.ndarray) -> np.ndarray:
-        # todo
-        pass
 
 
 class SumpleteProblemSubtaskA(SumpleteProblem):

@@ -36,7 +36,14 @@ class GeneticAlgorithm:
             genome = self.current_population[index]
             individual_fitness[index] = self.problem.evaluate_fitness(genome)
 
-        probabilities = individual_fitness / np.sum(individual_fitness)
+        # some problems yield negative fitness, this is bad for probabilities, therefore we normalize
+        positive_fitness = individual_fitness - np.min(individual_fitness)
+
+        # in theory at this point all fitness could equal zero, therefore for calculation safety
+        if np.all(positive_fitness == 0):
+            positive_fitness[:] = 1
+
+        probabilities = positive_fitness / np.sum(positive_fitness)
 
         mating_pool_indexes = np.random.choice(
             current_population_size, number_of_vacant_spaces, p=probabilities)
@@ -63,7 +70,6 @@ class GeneticAlgorithm:
         if start == end:
             end = np.random.randint(start+1, genome_length, 1)[0]
 
-        print('start and end', start, end)
         child_solution = np.zeros(genome_length)
 
         for index in range(genome_length):
@@ -75,15 +81,15 @@ class GeneticAlgorithm:
         return child_solution
 
     def mutate_solutions(self):
-        # todo
-        pass
+        mutation_flags = np.random.rand(self.population_size) < self.mutation_probability
+        for index in range(self.population_size):
+            if mutation_flags[index]:
+                self.current_population[index] = self.problem.mutate_solution(self.current_population[index])
 
     def compute_generation(self):
-        #print(self.current_population)
         self.select_and_replenish_population()
         self.mutate_solutions()
         self.generations_computed += 1
-        #print(self.current_population)
 
     def best_solution_currently(self):
         self.sort_population_by_fitness()
