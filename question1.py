@@ -8,28 +8,45 @@ import numpy as np
 ''' Setting up the problem '''
 
 problem_dimensions = 2
-min_generated_pos = 0
-max_generated_pos = 3
+min_generated_pos = -5.12
+max_generated_pos = 5.12
 
 
-def evaluate_the_fitness(given_solution):
+def variable_rastrign_function(input_vector):
+    number_of_dims = len(input_vector)
+
+    overall_sum = 0
+
+    for input_scalar in input_vector:
+        overall_sum += input_scalar ** 2 + 10 * math.cos(2 * math.pi * input_scalar)
+
+    return 10 * number_of_dims + overall_sum
+
+
+def evaluate_the_fitness(given_solution, check_if_within_min_max=False):
     copy_of_given_solution = np.copy(given_solution)
 
-    # entries above 9, assign a penalty to them
-    copy_of_given_solution[copy_of_given_solution > 9] *= -2
+    penalties = 0
 
-    return np.sum(copy_of_given_solution)
+    if check_if_within_min_max:
+        # apply a penalty for values over max
+        penalties += copy_of_given_solution[copy_of_given_solution > max_generated_pos] ** 2
+        # apply a penalty for values below min
+        penalties += copy_of_given_solution[copy_of_given_solution < min_generated_pos] ** 2
+
+    # we are trying to minimise penalties and the function therefore fitness will be * -1
+    return (variable_rastrign_function(copy_of_given_solution) + penalties) * -1
 
 
 ''' Setting up the algorithm '''
 
 velocity_inertia = 0.7
-personal_best_gravity = 3
-global_best_gravity = 1
+personal_best_gravity = 2
+global_best_gravity = 2
 
-global_best = [[0, 0, 0, 0, 0], -math.inf]
+global_best = [[0 for _ in range(problem_dimensions)], -math.inf]
 
-population_size = 20
+population_size = 1000
 
 
 class Particle:
@@ -37,8 +54,8 @@ class Particle:
         self.label = label
         self.position = np.random.rand(problem_dimensions) * (max_generated_pos - min_generated_pos) + min_generated_pos
         self.velocity = np.zeros(problem_dimensions)
-        # making a copy of global_best
-        self.personal_best = [[0, 0, 0, 0, 0], -math.inf]
+        # based on the initialization from the slides
+        self.personal_best = global_best
 
     def get_fitness_and_update_personal_best(self):
         own_current_fitness = evaluate_the_fitness(self.position)
@@ -58,7 +75,7 @@ class Particle:
         self.position += self.velocity
 
     def __str__(self):
-        return self.label+';'+';'.join(self.position.astype(str).tolist())
+        return 'pos:' + ';'.join(self.position.astype(str).tolist())
 
 
 # generate particles
@@ -77,13 +94,16 @@ def generational_loop(number_of_generations):
                 # take the copy of the position (to avoid reference issues)
                 global_best = [list(particle.position), current_fitness]
 
-        print('>>gen_'+str(current_generation)+'_best_fit|'+str(global_best[1])+'|at|'+str(global_best[0]))
+        print('>>gen_' + str(current_generation) + '_best_fit|' + str(global_best[1]) + '|at|' + str(global_best[0]))
 
         for particle in particles:
             particle.update_velocities()
             particle.change_position()
 
+        if global_best[1] > -0.0001:
+            return global_best
+
     return global_best
 
 
-print('Best solution is:', generational_loop(20))
+print('Best solution is:', generational_loop(200))
