@@ -67,8 +67,6 @@ class GeneticAlgorithm:
         # private static
         genome_length = len(genome1)
         start, end = np.sort(np.random.randint(0, genome_length, 2))
-        if start == end:
-            end = np.random.randint(start+1, genome_length, 1)[0]
 
         child_solution = np.zeros(genome_length)
 
@@ -93,7 +91,17 @@ class GeneticAlgorithm:
 
     def best_solution_currently(self):
         self.sort_population_by_fitness()
-        return self.current_population[0], self.problem.evaluate_fitness(self.current_population[0])
+        best_solution = self.current_population[0]
+        return best_solution, self.problem.evaluate_fitness(best_solution)
+
+    def compute_n_generations(self, number_of_generations: int, verbose=False):
+        for _ in range(number_of_generations):
+            self.compute_generation()
+            if verbose:
+                print('>>gen_' + str(self.generations_computed) + '_best_fit|'
+                      + str(self.best_solution_currently()[1]))
+
+
 
 
 

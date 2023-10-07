@@ -36,7 +36,7 @@ class ParticleSwarmOptimization:
 
         if verbose:
             print('>>gen_' + str(self.iterations_computed) + '_best_fit|'
-                  + str(self.global_best[1]) + '|at|' + str(self.global_best[0]))
+                  + str(self.global_best[1]))
 
         for particle in self.particles:
             particle.update_velocities()
