@@ -15,3 +15,10 @@ class Problem:
     def evaluate_fitness(self, solution: np.ndarray) -> float:
         # to be overwritten
         raise Exception("This method is abstract")
+
+
+class ProblemWithMutationScheme(Problem):
+    """ Abstract class, adding the mutation functionality"""
+    def mutate_solution(self, solution: np.ndarray) -> np.ndarray:
+        # to be overwritten
+        raise Exception("This method is abstract")

@@ -1,9 +1,9 @@
 import numpy as np
-from problemClass import Problem
+from problemClass import ProblemWithMutationScheme
 from sumpleteGame import SumpleteGame
 
 
-class BinaryVectorProblem(Problem):
+class BinaryVectorProblemWithMutationScheme(ProblemWithMutationScheme):
     """ Abstract class for binary problems """
 
     def __init__(self, solution_vector_length: int):
@@ -13,7 +13,7 @@ class BinaryVectorProblem(Problem):
         return np.random.randint(0, 2, size=self.number_of_dimensions)
 
 
-class SumpleteProblem(BinaryVectorProblem):
+class SumpleteProblem(BinaryVectorProblemWithMutationScheme):
     """ Class for the Sumplete Problem, this uses the more robust fitness method from subtask b """
 
     '''
@@ -35,6 +35,10 @@ class SumpleteProblem(BinaryVectorProblem):
 
         # because we are minimising the error we multiply by -1
         return (np.sum(row_wise_errors_squared) + np.sum(column_wise_errors_squared)) * -1
+
+    def mutate_solution(self, solution: np.ndarray) -> np.ndarray:
+        # todo
+        pass
 
 
 class SumpleteProblemSubtaskA(SumpleteProblem):
