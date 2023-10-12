@@ -19,13 +19,30 @@ class NDimensionalRastriginProblem(Problem):
     def evaluate_fitness(self, solution: np.ndarray) -> float:
         penalties = 0
 
-        # apply a penalty for values over max
-        penalties += np.sum(solution[solution > self.solution_boundary[1]] ** 2)
-        # apply a penalty for values below min
-        penalties += np.sum(solution[solution < self.solution_boundary[0]] ** 2)
+        # apply a penalty for values over max and below min
+        for element in solution:
+            if element > self.solution_boundary[1]:
+                penalties += element ** 2
+            if element < self.solution_boundary[0]:
+                penalties += element ** 2
 
         # we are trying to minimise penalties and the function therefore fitness will be * -1
         return (NDimensionalRastriginProblem.__variable_rastrigin_function(solution) + penalties) * -1
+
+    def check_if_solution_valid(self, solution: np.ndarray) -> bool:
+        penalties = 0
+
+        # apply a penalty for values over max
+        for element in solution:
+            if element > self.solution_boundary[1]:
+                return False
+
+        # apply a penalty for values below min
+        for element in solution:
+            if element < self.solution_boundary[0]:
+                return False
+
+        return True
 
     def __variable_rastrigin_function(input_vector: np.ndarray) -> float:
         # private static
