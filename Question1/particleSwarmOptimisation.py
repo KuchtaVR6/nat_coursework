@@ -1,5 +1,7 @@
 import math
 import random
+import sys
+sys.path.append("..")
 from problemClass import Problem
 import numpy as np
 
