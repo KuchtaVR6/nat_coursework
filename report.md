@@ -2,21 +2,19 @@
 Patryk Kuchta - s2595201
 ## Problem 1
 
-Specification of the problem chosen:
+Specification of the problem selected:
 I have decided to work on minimising the output of the provided Rastrigin function, where all dimensions are
 searched within -5.12 to 5.12.
 
 It is important to note that an inspection of this function on a graph quickly reveals that this function can
-easily 'trap' any algorithm into a local optimum hence the expectations for the performance of the algorithm 
+easily 'trap' any algorithm into a local optimum. Therefore, the expectations for the performance of the algorithm 
 cannot be too high in this case.
 
 The algorithm I have chosen is the Particle Swarm Optimization algorithm.
 
-### Question a)
+**Fitness Function**
 
-**Fitness**
-
-First I have fixed the difficulty of the problem to 5 dimensions. The cost function is defined as:
+First, I have fixed the difficulty of the problem to five dimensions. The cost function is defined as:
 ```python
 def evaluate_fitness(self, solution: np.ndarray) -> float:
     penalties = 0
@@ -29,28 +27,49 @@ def evaluate_fitness(self, solution: np.ndarray) -> float:
     # we are trying to minimise penalties and the function therefore fitness will be * -1
     return (NDimensionalRastriginProblem.__variable_rastrigin_function(solution) + penalties) * -1
 ```
-Which is the output of the Rastrigin function, with the added penalties, which is the summed squared difference 
-between the search space boundary and the value for each dimension that has left the search boundary. Penalties
-will always equal 0 if all dimensions are within the search space. This number is multiplied by * -1, because
-the algorithm I have written is aimed at maximising the fitness.
-
-My methodology for finding the optimal population size will for each population size tested (starting from 1)
-record the number of iterations before reaching an acceptable solution (more on that later), but only if all 
-the dimensions are within the search space, until reaching the population of 60.
+Which is the output of the Rastrigin function, with the added penalties, which is the summed squared difference between the search space boundary and the value for each dimension that has left the search boundary. Penalties will always equal 0 if all dimensions are within the search space. This number is multiplied by * -1, because the algorithm I have written is aimed at maximising fitness.
 
 **Acceptable solutions**
 
-Acceptable solutions have been selected based on running the PSO algorithm for the same problem but with 
-generous population of 100, 300 iterations and this algorithm has been run for 10 times to select the best
-output of all 10 of the tests.
+Acceptable solutions have been selected based on running the PSO algorithm for the same problem but with a generous population of 100, 300 iterations, and this algorithm has been run for 10 times to select the best output of all 10 of the tests.
 
-Because there is a high chance that PSO will be unable to find an optimum this good (especially for small 
-populations), run the algorithm 100 times and if it is able to find a good enough optimum, its number of
-iterations will be taken into considerations and average over all successful runs. If it is unable to find
-the optimal value it will be recorded in the success rate.
+Using this methodology, the best optimum found for 5 dimensions had the fitness of `-3.233616069943885` therefore the fitness that be required for the solution to be deemed as good enough will be `-9.700848209831655`, as this will be 3 times the best solution found and this allows the testing to observe and reward 'quite good' solutions not just best possible.
 
-Using this methodology, the best optimum found for 5 dimensions had the fitness of `-3.233616069943885`
-therefore the fitness that be required for the solution to be deemed as good enough will be `-9.700848209831655`.
+**Parameter selection**
+
+My methodology for finding the parameters will for each population size test (starting from 1) to run the model and record the number of iterations before reaching an acceptable solution, until reaching the population of 60. Please note that for most test the behaviour for small populations is quite random and luck-based, due to the behaviour of the PSO algorithm in those cases.
+
+Because there is a high chance that PSO will be unable to find an optimum this good (especially for small populations), the algorithm is run 100 times, and if it is able to find a good enough optimum, its number of iterations will be taken into the overall average. Otherwise, the failure to find the optimum  will be recorded in the success rate.
+
+> TODO add the paper
+
+The search for a set of optimum parameters has been started by researching the effects of different parameters in terms of particle behaviour and divergence `insert the paper here`, assuming no prior knowledge of the problem the behaviour of both zigzagging and oscillating will could be useful to the problem. To achieve this behaviour, the values of inertia will be kept close to 1, whilst the sum of the forces kept equal to 4. Running the algorithm for a set of very generic parameters (inertia = 0.7, both forces = 2), quickly revealed that the algorithm makes rather slow progress, the global best would be stuck on the current perceived global best for while. 
+
+*Alpha values*
+
+This points to the issue that in this problem there is need to de-emphasize exploitation and focus more on exploration. This pointed first to increasing the personal best force, whilst sacrificing the global best.
+
+> TODO add the graphs
+
+These tests show that increasing the importance of the personal_best has lead to large improvements in the algorithm, but they are coming with the expense of the success rate. Based on these findings, all considerations going forward will use the personal_best_force = 3.5 and global_best_force = 0.5, as these values give a good balance between relatively reliably getting an answer and optimising the number of iterations.
+
+*Inertia*
+
+Similar tests have been performed for different inertia, the findings are:
+
+> TODO add the graphs
+
+In the case of inertia, there is no more clear benefit in changing the value as any improvement in the success rate comes at the expense of the average required number of iterations. Inertia of 0.85 will be used as it has shown good performance in terms of average iterations required, and did not cause the success rate to go too low like in the case of inertia = 0.7.
+
+### Question a)
+
+**Modified test set up**
+
+These tests will be run slightly differently as it will be preferable to produce one metric for each population size rather than a more nuanced two values in the tests for the parameters. In these tests each test of a given population size (still searched between 1 and 60), will be given an equal `budget` for the maximum number of evaluations of the fitness it can perform. Additionally, the model will only be restarted if the progress in the algorithm stops improving* without reaching an acceptable optimum or as soon as the acceptable optimum is reached. The metric for the comparison will be how many times the model was able to reach the acceptable optimum within its evaluation budget. This metric will neatly combine computational cost and the costs associated with not converging with the perceived performance. For simplicity, this metric will be referred to as optimal convergences given k evaluations. The budget has been set to `k = 1 000 000` as this is the largest number feasible with my limited computational power.
+
+*Small note about going over budget, for simplicity going over-budget within an iteration of the algorithm is allowed, but the algorithm will be stopped right after. Although it does introduce as small advantage for bigger populations, it should not be significant to the testing.
+
+The asterix* next to stop improving is because it is difficult to determine when a model is not making progress. Therefore, for the purposes of these test 'stops improving' will be approximated as the model has not made any improvements to the fitness in more than 25 iterations.
 
 **Findings**
 
@@ -60,21 +79,11 @@ Based on these plots
 ```
 insert plots here
 ```
-The testing points that 29 is an optimal population value for this problem. The success rate was at a local
-peak at 0.66, which means 2 out of 3 runs were successful and finding this optimum, and it only took 149 
-iterations on average. Of course higher populations produce better numbers but have a much higher computational
-cost.
-
-Please note that populations size below 4, have never produced a satisfying output, therefore the data and
-plots start from population 4.
 
 ### Question b)
 
 To answer this task I will examine what are the optimal values for the following problem complexities (numbers
 of dimensions of the solution): 2, 3, 4, 5, 6, 7.
-
-One adjustment to the previous approach will be tho limit the maximum population size in the search to 60, as
-this is the range that the optimal values will likely occur.
 
 Based on a run of PSO algorithm with generous computational power (just like in task a), the best solutions 
 found are:
