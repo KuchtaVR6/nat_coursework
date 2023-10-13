@@ -65,7 +65,7 @@ In the case of inertia, there is no more clear benefit in changing the value as 
 
 **Modified test set up**
 
-These tests will be run slightly differently as it will be preferable to produce one metric for each population size rather than a more nuanced two values in the tests for the parameters. In these tests each test of a given population size (still searched between 1 and 60), will be given an equal `budget` for the maximum number of evaluations of the fitness it can perform. Additionally, the model will only be restarted if the progress in the algorithm stops improving* without reaching an acceptable optimum or as soon as the acceptable optimum is reached. The metric for the comparison will be how many times the model was able to reach the acceptable optimum within its evaluation budget. This metric will neatly combine computational cost and the costs associated with not converging with the perceived performance. For simplicity, this metric will be referred to as optimal convergences given k evaluations. The budget has been set to `k = 1 000 000` as this is the largest number feasible with my limited computational power.
+These tests will be run slightly differently as it will be preferable to produce one metric for each population size rather than a more nuanced two values in the tests for the parameters. In these tests each test of a given population size (still searched between 1 and 100), will be given an equal `budget` for the maximum number of evaluations of the fitness it can perform. Additionally, the model will only be restarted if the progress in the algorithm stops improving* without reaching an acceptable optimum or as soon as the acceptable optimum is reached. The metric for the comparison will be how many times the model was able to reach the acceptable optimum within its evaluation budget. This metric will neatly combine computational cost and the costs associated with not converging with the perceived performance. For simplicity, this metric will be referred to as optimal convergences given k evaluations. The budget has been set to `k = 1 000 000` as this is the largest number feasible with my limited computational power.
 
 *Small note about going over budget, for simplicity going over-budget within an iteration of the algorithm is allowed, but the algorithm will be stopped right after. Although it does introduce as small advantage for bigger populations, it should not be significant to the testing.
 
@@ -73,23 +73,21 @@ The asterix* next to stop improving is because it is difficult to determine when
 
 **Findings**
 
-> TODO redo this bit with new data
-
-Based on these plots
+For the Rastrigin problem represented in five dimensions, the result of the tests can be reported in this way
 ```
 insert plots here
 ```
+This plot suggests that values between 10 and 34 can be all considered optimal. The data produced is quite noisy, and drawing a single point as definetely the optimal would be ill-judged. If tasked with choosing only one value, the choice of value 20, which is where the maximum performance has been reached, would be a sensible values. However, there is it would be hard to concretely prove that it is better than any other values from 10 to 34.
 
 ### Question b)
 
-To answer this task I will examine what are the optimal values for the following problem complexities (numbers
-of dimensions of the solution): 2, 3, 4, 5, 6, 7.
+To answer this task, I will examine what are the optimal values for the following problem complexities (numbers
+of dimensions of the solution): 3, 4, 5, 6, 7.
 
 Based on a run of PSO algorithm with generous computational power (just like in task a), the best solutions 
 found are:
 
 ```
-2D: -0.49747968580168944
 3D: -0.7462195287025324
 4D: -0.994959371603386
 5D: -3.233616069943885
@@ -102,7 +100,6 @@ can be considered a good enough solution therefore minimal solution at which the
 will be:
 
 ```
-2D: -1.4924390574050683
 3D: -2.238658586107597
 4D: -2.984878114810158
 5D: -9.700848209831655
@@ -110,19 +107,29 @@ will be:
 7D: -17.16303783787211
 ```
 
-> TODO continue
+Please note that as the method for selecting the value is not perfect, it cannot be assumed that thresholds are all representing a proportional or equivalent difficulty for the program. It maybe even argued that the selection method for these values could be a bit more lenient for the higher dimensionality problems.
+
+The tests performed for this section are the same for the previous task.
+
+The testing has produced these results:
+
+> TODO insert plots
+ 
+As this evaluation method and the algorithm tested tend to produce noisy data, a smoothed version of the graph may be easier to analyse:
+
+For all dimensions, except for the dimensionality of three, it is visible that the set of optimal population sizes, stays relatively stable at around populations between 10 and 30. This is because the dynamics of the group, which rely on each of the particles to be drawn to 2 previous optimas, will over time particles will become very similar over time if the set of particles is large enough. Therefore, we are able to observe the slow decrease in the metric as we raise the population as each new particle has a higher chance of not contributing by the virtue of becoming too similar to other particles. This means at one point each new particle becomes less of a benefit and more of a computational burden. This behaviour is kept with the number of dimensions raising because the impact of the group dynamics and the force does not increase nor decrease with respect to the number of dimensions.
+
+The exception is 3 dimensions, where I believe the added computation burden of a growing population was offset by purely increasing the chances of landing on a solution by luck rather than by utilising group dynamics, which makes sense given the whole search space is (10.24)^3, which makes getting a lucky solution quite a frequent occurrence. However its worth noting that even in those peculiar circumstances, the choice of a population from the set 10–30 would still yield good performance in comparison to the rest of the option (although not best). 
 
 ## Question 2
 
-Encoding, will be in a k^2 binary vector where each scalar denotes whether a given value in the games matrix
-should be deleted or not (deletion = 0, retention = 1), and ought to be read as
+Encoding will be achieved by the use of a k^2 binary vector where each scalar denotes whether a given value in the games' matrix should be deleted or not (deletion = 0, retention = 1), and ought to be read as
 
 ``` Deletion_of(x,y) = Encoding_vector(k*y + x)  ```
 
 (i.e. flattening the matrix into a vector)
 
-This makes the mutations simple, as they could simply be based on bit flipping, and the fitness_evaluation is
-also quite computationally simple, which is great as this operation will be performed often.
+This makes the mutations simple, as they could simply be based on bit flipping, and the fitness_evaluation is also quite computationally simple, which is great as this operation will be performed often.
 
 > TODO discuss the parameters here 
 

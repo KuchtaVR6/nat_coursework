@@ -79,13 +79,13 @@ def look_for_optimal_population_size(problem, minium_acceptable_fitness, max_pop
 
 min_acceptable_optimas = [-1.4924390574050683, -2.238658586107597, -2.984878114810158, -9.700848209831655,
                           -10.447067738537797, -17.16303783787211]
-start_from = 3
-end_on = 5
+start_from = 6
+end_on = 8
 
 for problem_dimensionality in range(start_from, end_on + 1):
     problem = NDimensionalRastriginProblem(problem_dimensionality, (-5.12, 5.12))
     print(problem_dimensionality, '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
-    look_for_optimal_population_size(problem, min_acceptable_optimas[problem_dimensionality - 2], 60)
+    look_for_optimal_population_size(problem, min_acceptable_optimas[problem_dimensionality - 2], 100)
     print(problem_dimensionality, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
 
 
