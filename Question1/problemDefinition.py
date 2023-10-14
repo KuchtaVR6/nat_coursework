@@ -33,7 +33,6 @@ class NDimensionalRastriginProblem(Problem):
         return (NDimensionalRastriginProblem.__variable_rastrigin_function(solution) + penalties) * -1
 
     def check_if_solution_valid(self, solution: np.ndarray) -> bool:
-        penalties = 0
 
         # apply a penalty for values over max
         for element in solution:

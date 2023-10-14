@@ -19,10 +19,18 @@ class GeneticAlgorithm:
 
         self.generations_computed = 0
         self.current_population = [problem.generate_random_solution() for _ in range(population_size)]
+        self.best_solution_ever = [self.current_population[0], problem.evaluate_fitness(self.current_population[0])]
+        self.evaluations_performed = 0
 
     def sort_population_by_fitness(self):
         """ Descending fitness """
         self.current_population.sort(key=self.problem.evaluate_fitness, reverse=True)
+        self.evaluations_performed += self.population_size
+
+        current_best = self.current_population[0]
+        current_best_fitness = self.problem.evaluate_fitness(self.current_population[0])
+        if current_best_fitness > self.best_solution_ever[1]:
+            self.best_solution_ever = [current_best, current_best_fitness]
 
     def select_and_replenish_population(self, elitism=0):
         self.sort_population_by_fitness()
@@ -36,7 +44,7 @@ class GeneticAlgorithm:
             genome = self.current_population[index]
             individual_fitness[index] = self.problem.evaluate_fitness(genome)
 
-        # some problems yield negative fitness, this is bad for probabilities, therefore we normalize
+        # some problems yield negative fitness, this is bad for probabilities, therefore, we normalise
         positive_fitness = individual_fitness - np.min(individual_fitness)
 
         # in theory at this point all fitness could equal zero, therefore for calculation safety

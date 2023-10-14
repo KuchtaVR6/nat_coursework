@@ -131,17 +131,45 @@ Encoding will be achieved by the use of a k^2 binary vector where each scalar de
 
 This makes the mutations simple, as they could simply be based on bit flipping, and the fitness_evaluation is also quite computationally simple, which is great as this operation will be performed often.
 
-> TODO discuss the parameters here 
+**Parameter selection**
+
+For this problem, the ranges for possible parameters have been constrained into the following ranges:
+- population_size from 100 to 400, with step 10 (i.e. 100, 110, 120..., 390, 400)
+- mutation_rate from 0.1 to 0.9, with step 0.9 (i.e. 0.1, 0.2, 0.3..., 0.8, 0.9)
+- crossover_rate from 0.1 to 0.9, with step 0.9 (i.e. 0.1, 0.2, 0.3..., 0.8, 0.9)
+
+For each pair of parameters, the genetic algorithm will be run for a number of iterations, until exhausting the given budget of evaluations, restarting after finding a correct solution or when the number of iterations goes above a 20. The final performance metric will be the number of times that the genetic algorithm has reached the correct solution.
+
+This is quite constraining, but it should be able to produce at least meaningful information pointing to better parameters or in the best cases, a good set of parameters.
+
+> TODO talk about selection and mutation
 
 ### Question a)
 
-> TODO This question
+Firstly, selecting the parameters for this problem will be useful. To select the parameters, the 3 x 3 version of the problem will be used so that the computations are a bit faster. The First observations are that given a budget of 100 000 evaluations, the algorithm was still struggling to find the solutions for many parameters. Here are the top 40 best performing parameters tuples.
+
+> TODO insert the tuples here
+ 
+This shows that there is a lot of variances in the mutation_rate and crossover_rate for tuples that still performed well. This points to the fact that in the current state the algorithm doesn't get much of a benefit from crossover and mutations. Mutations nor crossover_rate. One thing that is quite consistent is that the larger population sizes have performed better.
+
+At this point, a selection of a large population (e.g. 300) and any mutation/crossover rate could be chosen.
+
+But this testing done in order to produce an optimal tuple of parameters shows the issues with this fitness function in general, which is that the genetic algorithm has no way of knowing which solutions are better, if they aren't the correct solution (if one of them is, then the algorithm is done regardless). This makes it so that a larger population size necessitates more random initialisations is better as the algorithm is basically reduced in its functionality to just a random search. Mutations even if they happen often are not really useful as it is better to just create a new random solution, rather than mutate an existing one if only thing we know about it is that it is incorrect. Similar argument shows that crossover is not helpful either as the algorithm doesn't know which genomes to cross over as from its point of view they are all equally bad. 
+
+Here are the findings for multiple dimensionality of the problem (using parameters 300, 0.5, 0.5, and 300 iterations, 100 times (each time with a new model (i.e. resetting)). The number represents the number of times the model has reached the correct solution.
+
+> TODO add the findings
+ 
+This shows that as the dimensionality of the problem grows this fitness function becomes more of an issue as random search becomes less and less feasible as we increase the problems complexity.
 
 ### Question b)
 
-A fitness function better suited for larger instances of the problem would be a fitness function that will
-tell the model when it is getting closer to the correct solution as this will allow it to select better solutions
-for the future generations. One algorithm capable of doing that is this:
+**Proposed fitness function**
+
+A fitness function better suited for larger instances of the problem will be a fitness function:
+- that will tell the model when it is getting closer to the correct solutions
+- that will reward getting the correct sum in each dimension
+this will allow it to select solutions that are in theory closer to the correct answer for the future generations. This scheme can be represented using the code below:
 
 ```python
 def evaluate_fitness(self, solution: np.ndarray) -> float:
@@ -150,13 +178,27 @@ def evaluate_fitness(self, solution: np.ndarray) -> float:
     row_wise_errors_squared = (self.game.correct_sums['rows'] - solution_sums[0]) ** 2
     column_wise_errors_squared = (self.game.correct_sums['cols'] - solution_sums[1]) ** 2
 
-    # because we are minimising the error we multiply by -1
-    return (np.sum(row_wise_errors_squared) + np.sum(column_wise_errors_squared)) * -1
+    reaching_zero_reward = (len(row_wise_errors_squared[row_wise_errors_squared == 0]) +
+                            len(column_wise_errors_squared[column_wise_errors_squared == 0])) * 4
+
+    # because we are minimising the error, we multiply by -1
+    return (np.sum(row_wise_errors_squared) + np.sum(column_wise_errors_squared)) * -1 + reaching_zero_reward
 ```
 
-The fitness in this function is defined as the sum of square differences between the correct sums and
-the sums that the given solution gives. Because again the algorithm use maximises fitness, this number
-has to be multiplied by -1 in order for the algorithm to work properly.
+The fitness in this function is defined as the negative sum of square differences between the correct sums and
+the sums that the given solution gives, plus a +4 reward for each sum that the solution gets correctly. 
+
+**Parameter selection**
+
+To choose the parameters, the analysis was the same as in the previous subtask. However, it after a quick test this fitness function has proven that the number of allowed interactions before the default restarting to 200, because with this fitness function the algorithm is able to make progress for longer.
+
+The best performance has been reached for population_size 150, mutation rate 0.1, and crossover_rate 0.9, and many of the best parameter tuples it mutation_rate was between 0.1 - 0.3 and the crossover_rate 0.7–0.9, and the population_size within 120 to 190. Therefore, to limit the effect of noise which might have been the reason for the best tuple, the final parameters chosen will be:
+
+```
+population_size = 150
+mutation_rate = 0.2
+crossover_rate = 0.8
+```
 
 
 

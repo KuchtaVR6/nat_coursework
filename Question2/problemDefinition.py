@@ -38,8 +38,17 @@ class SumpleteProblem(BinaryVectorProblemWithMutationScheme):
         row_wise_errors_squared = (self.game.correct_sums['rows'] - solution_sums[0]) ** 2
         column_wise_errors_squared = (self.game.correct_sums['cols'] - solution_sums[1]) ** 2
 
-        # because we are minimising the error we multiply by -1
-        return (np.sum(row_wise_errors_squared) + np.sum(column_wise_errors_squared)) * -1
+        reaching_zero_reward = (len(row_wise_errors_squared[row_wise_errors_squared == 0]) +
+                                len(column_wise_errors_squared[column_wise_errors_squared == 0])) * 4
+
+        # because we are minimising the error, we multiply by -1
+        return (np.sum(row_wise_errors_squared) + np.sum(column_wise_errors_squared)) * -1 + reaching_zero_reward
+
+    def check_if_correct_solution(self, solution: np.ndarray) -> bool:
+        solution_sums = self.game.calculate_the_sums_given_solution(solution)
+
+        return (np.array_equal(solution_sums[0], self.game.correct_sums['rows']) and
+                np.array_equal(solution_sums[1], self.game.correct_sums['cols']))
 
 
 class SumpleteProblemSubtaskA(SumpleteProblem):
