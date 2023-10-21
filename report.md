@@ -210,6 +210,8 @@ crossover_rate = 0.8
 
 Different parameters pairs affect the solution. Crossover rate will tend to create solution that are combinations of low deletion of small values that iteratively get closer to the correct solution. One could consider these solutions as 'not-optimal' as then will have more deletions than other solutions (this is assuming that there is more than one solution which is not always the case for a given game). Population size and mutation rate will tend to create more random solution that can be both considered 'optimal' or 'not-optimal'.
 
+## Problem 3
+
 
 
 
