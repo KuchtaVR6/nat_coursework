@@ -47,6 +47,8 @@ class SumpleteProblem(BinaryVectorProblemWithMutationScheme):
     def check_if_correct_solution(self, solution: np.ndarray) -> bool:
         solution_sums = self.game.calculate_the_sums_given_solution(solution)
 
+        print(self.game.correct_sums, solution_sums)
+
         return (np.array_equal(solution_sums[0], self.game.correct_sums['rows']) and
                 np.array_equal(solution_sums[1], self.game.correct_sums['cols']))
 

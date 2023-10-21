@@ -156,9 +156,15 @@ At this point, a selection of a large population (e.g. 300) and any mutation/cro
 
 But this testing done in order to produce an optimal tuple of parameters shows the issues with this fitness function in general, which is that the genetic algorithm has no way of knowing which solutions are better, if they aren't the correct solution (if one of them is, then the algorithm is done regardless). This makes it so that a larger population size necessitates more random initialisations is better as the algorithm is basically reduced in its functionality to just a random search. Mutations even if they happen often are not really useful as it is better to just create a new random solution, rather than mutate an existing one if only thing we know about it is that it is incorrect. Similar argument shows that crossover is not helpful either as the algorithm doesn't know which genomes to cross over as from its point of view they are all equally bad. 
 
-Here are the findings for multiple dimensionality of the problem (using parameters 300, 0.5, 0.5, and 300 iterations, 100 times (each time with a new model (i.e. resetting)). The number represents the number of times the model has reached the correct solution.
+Here are the findings for multiple dimensionality of the problem (using parameters 300, 0.5, 0.5, and 300 iterations, 100 times (each time with a new model (i.e. resetting)). The number represents the number of times the model has reached the correct solution.    
 
-> TODO add the findings
+```
+2D:100
+3D:100
+4D:12
+5D:0
+6D:0
+```
  
 This shows that as the dimensionality of the problem grows this fitness function becomes more of an issue as random search becomes less and less feasible as we increase the problems complexity.
 
@@ -199,6 +205,11 @@ population_size = 150
 mutation_rate = 0.2
 crossover_rate = 0.8
 ```
+
+### Question c)
+
+Different parameters pairs affect the solution. Crossover rate will tend to create solution that are combinations of low deletion of small values that iteratively get closer to the correct solution. One could consider these solutions as 'not-optimal' as then will have more deletions than other solutions (this is assuming that there is more than one solution which is not always the case for a given game). Population size and mutation rate will tend to create more random solution that can be both considered 'optimal' or 'not-optimal'.
+
 
 
 

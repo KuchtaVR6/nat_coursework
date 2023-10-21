@@ -44,7 +44,7 @@ def search_for_good_params():
                 print(population_size, ";", mutation_rate, ";", crossover_rate, ";", solution_reached_counter)
 
 
-for dimensionality in range(3, 7):
+for dimensionality in range(2, 7):
     dim_game = SumpleteGame(dimensionality)
     dim_problemClass = SumpleteProblemSubtaskA(dim_game)
 
@@ -53,9 +53,9 @@ for dimensionality in range(3, 7):
     for reset in range(0, 100):
         model = GeneticAlgorithm(dim_problemClass, 300, 0.5, 0.5)
 
-        model.compute_n_generations(100)
+        model.compute_n_generations(50)
 
-        if dim_problemClass.check_if_correct_solution(model.best_solution_ever[0]):
+        if model.best_solution_ever[1] == 1:
             solutions_found += 1
 
     print(f'{dimensionality}D:{solutions_found}')
