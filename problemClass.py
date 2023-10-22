@@ -8,11 +8,11 @@ class Problem:
     def __init__(self, number_of_dimensions):
         self.number_of_dimensions = number_of_dimensions
 
-    def generate_random_solution(self) -> np.ndarray:
+    def generate_random_solution(self):
         # to be overwritten
         raise Exception("This method is abstract")
 
-    def evaluate_fitness(self, solution: np.ndarray) -> float:
+    def evaluate_fitness(self, solution) -> float:
         # to be overwritten
         raise Exception("This method is abstract")
 

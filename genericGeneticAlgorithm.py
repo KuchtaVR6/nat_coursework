@@ -3,7 +3,7 @@ import numpy as np
 from problemClass import ProblemWithMutationScheme
 
 
-class GeneticAlgorithm:
+class GenericGeneticAlgorithm:
 
     def __init__(
             self,
@@ -67,24 +67,12 @@ class GeneticAlgorithm:
             random_score = np.random.rand()
             if random_score < self.crossover_probability:
                 self.current_population.append(
-                    GeneticAlgorithm.__crossover_two_genomes(mating_pool[index], mating_pool[-index]))
+                    self.crossover_two_genomes(mating_pool[index], mating_pool[-index]))
             else:
                 self.current_population.append(mating_pool[index])
 
-    def __crossover_two_genomes(genome1, genome2) -> np.ndarray:
-        # private static
-        genome_length = len(genome1)
-        start, end = np.sort(np.random.randint(0, genome_length, 2))
-
-        child_solution = np.zeros(genome_length)
-
-        for index in range(genome_length):
-            if start <= index <= end:
-                child_solution[index] = genome1[index]
-            else:
-                child_solution[index] = genome2[index]
-
-        return child_solution
+    def crossover_two_genomes(self, genome1, genome2):
+        raise Exception("This method is abstract")
 
     def mutate_solutions(self):
         mutation_flags = np.random.rand(self.population_size) < self.mutation_probability

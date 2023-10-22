@@ -1,6 +1,6 @@
 from sumpleteGame import SumpleteGame
 from problemDefinition import SumpleteProblem, SumpleteProblemSubtaskA
-from geneticAlgorithm import GeneticAlgorithm
+from geneticAlgorithmForVectorProblems import GeneticAlgorithmForVectorProblems
 
 matrix_size = 3
 
@@ -26,8 +26,8 @@ def search_for_good_params():
                 overall_evaluation_performed = 0
 
                 while overall_evaluation_performed < budget:
-                    genetic_algorithm = GeneticAlgorithm(sumpleteProblem, population_size,
-                                                         mutation_rate, crossover_rate)
+                    genetic_algorithm = GeneticAlgorithmForVectorProblems(sumpleteProblem, population_size,
+                                                                          mutation_rate, crossover_rate)
 
                     for generations in range(0, 50):
                         genetic_algorithm.compute_n_generations(1)
@@ -43,19 +43,39 @@ def search_for_good_params():
 
                 print(population_size, ";", mutation_rate, ";", crossover_rate, ";", solution_reached_counter)
 
+'''subtask a'''
+
+# for dimensionality in range(2, 7):
+#     dim_game = SumpleteGame(dimensionality)
+#     dim_problemClass = SumpleteProblemSubtaskA(dim_game)
+#
+#     solutions_found = 0
+#
+#     for reset in range(0, 100):
+#         model = GeneticAlgorithmForVectorProblems(dim_problemClass, 300, 0.5, 0.5)
+#
+#         model.compute_n_generations(50)
+#
+#         if model.best_solution_ever[1] == 1:
+#             solutions_found += 1
+#
+#     print(f'{dimensionality}D:{solutions_found}')
+
+'''subtask b'''
 
 for dimensionality in range(2, 7):
     dim_game = SumpleteGame(dimensionality)
-    dim_problemClass = SumpleteProblemSubtaskA(dim_game)
+    dim_problemClass = SumpleteProblem(dim_game)
 
     solutions_found = 0
 
     for reset in range(0, 100):
-        model = GeneticAlgorithm(dim_problemClass, 300, 0.5, 0.5)
+        model = GeneticAlgorithmForVectorProblems(dim_problemClass,
+                                                  150, 0.2, 0.8)
 
-        model.compute_n_generations(50)
+        model.compute_n_generations(100)
 
-        if model.best_solution_ever[1] == 1:
+        if dim_problemClass.check_if_correct_solution(model.best_solution_ever[0]):
             solutions_found += 1
 
     print(f'{dimensionality}D:{solutions_found}')
