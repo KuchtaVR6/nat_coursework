@@ -11,17 +11,22 @@ class GeneticProgrammingProblem(ProblemWithMutationScheme):
             possible_constants,
             max_solution_depth,
             training_data,
-            input_vector_length=1
+            input_vector_length=1,
+            recursive_inner_mutation_prob=0.3,
+            fitness_error_exponent=1
     ):
         super().__init__(0)
 
         self.possible_functions = possible_functions
+        self.function_labels = function_labels
         self.possible_constants = possible_constants
         self.input_vector_length = input_vector_length
         self.max_solution_depth = max_solution_depth
         self.training_data = training_data
+        self.fitness_error_exponent = fitness_error_exponent
 
         self.name_to_function_map = dict(zip(function_labels, possible_functions))
+        self.recursive_inner_mutation_prob = recursive_inner_mutation_prob
 
     def generate_random_solution(self):
         new_solution = MathematicalFunctionTreeNode(self, 'input-0')
@@ -30,14 +35,14 @@ class GeneticProgrammingProblem(ProblemWithMutationScheme):
 
     def evaluate_fitness(self, solution) -> float:
 
-        sum_of_squared_errors = 0
+        sum_of_errors = 0
 
-        for input, target in self.training_data:
-            output = solution.calculate(input)
+        for inputs, target in self.training_data:
+            output = solution.calculate(inputs)
 
-            sum_of_squared_errors += (target - output) ** 2
+            sum_of_errors += abs(target - output) ** self.fitness_error_exponent
 
-        return -1 * sum_of_squared_errors
+        return -1 * sum_of_errors
 
     def mutate_solution(self, solution):
         new_solution = solution.make_copy()
@@ -45,6 +50,7 @@ class GeneticProgrammingProblem(ProblemWithMutationScheme):
         new_solution.mutate(0.3)
 
         return new_solution
+
 
 class MathematicalFunctionTreeNode:
     def __init__(self, problem: GeneticProgrammingProblem, stored, left=None, right=None):
@@ -85,7 +91,7 @@ class MathematicalFunctionTreeNode:
             return function(self.left.calculate(inputs), self.right.calculate(inputs))
 
     def grow_randomly(self, wanted_depth):
-        if wanted_depth == 1:
+        def generate_terminal():
             if random.random() < 0.5:
                 self.stored = 'constant-' + str(
                     self.problem.possible_constants[
@@ -93,18 +99,25 @@ class MathematicalFunctionTreeNode:
                     ])
             else:
                 self.stored = 'input-' + str(random.randint(0, self.problem.input_vector_length - 1))
+
+        if wanted_depth == 1:
+            generate_terminal()
         elif wanted_depth > 1:
-            self.stored = 'function-' + self.problem.possible_functions[
-                random.randint(0, len(self.problem.possible_functions) - 1)]
+            random_chance = random.random()
+            if random_chance < 0.3:
+                generate_terminal()
+            else:
+                self.stored = 'function-' + self.problem.function_labels[
+                    random.randint(0, len(self.problem.function_labels) - 1)]
 
-            new_left = MathematicalFunctionTreeNode(self.problem, 'input-0')
-            new_right = MathematicalFunctionTreeNode(self.problem, 'input-0')
+                new_left = MathematicalFunctionTreeNode(self.problem, 'input-0')
+                new_right = MathematicalFunctionTreeNode(self.problem, 'input-0')
 
-            new_left.grow_randomly(wanted_depth - 1)
-            new_right.grow_randomly(wanted_depth - 1)
+                new_left.grow_randomly(wanted_depth - 1)
+                new_right.grow_randomly(wanted_depth - 1)
 
-            self.left = new_left
-            self.right = new_right
+                self.left = new_left
+                self.right = new_right
 
     def get_depth(self):
         left_depth = 0
@@ -129,7 +142,6 @@ class MathematicalFunctionTreeNode:
         return 1 + left_volume + right_volume
 
     def mutate(self, mutation_prob):
-
         dice_roll = random.random()
 
         if dice_roll < mutation_prob:
@@ -163,12 +175,12 @@ class MathematicalFunctionTreeNode:
                 right_volume = self.right.get_volume()
                 if index < right_volume:
                     return self.right.cut_and_return_copy(index)
-            raise IndexError
+            raise IndexError('index exceeds tree size')
 
     # does not work for replacing the root
     def insert_tree(self, index, inserted_tree):
         if index == 0:
-            raise IndexError
+            raise IndexError('index has reached zero')
         elif index == 1:
             self.left = inserted_tree
             return
@@ -187,13 +199,18 @@ class MathematicalFunctionTreeNode:
                 right_volume = self.right.get_volume()
                 if index < right_volume:
                     return self.right.insert_tree(index, inserted_tree)
-            raise IndexError
+            raise IndexError('index exceeds tree size')
 
-    def crossover(self, other, crossover_prob):
-        dice_roll = random.random()
-        if dice_roll < crossover_prob:
-            self_cut_index = random.randint(1, self.get_volume())
-            other_cut_index = random.randint(1, other.get_volume())
+    def crossover(self, other):
+        self_volume = self.get_volume()
+        other_volume = other.get_volume()
 
-            inserted_tree = other.cut_and_return_copy(other_cut_index)
-            self.insert_tree(self_cut_index, inserted_tree)
+        if self_volume == 1 or other_volume == 1:
+            # crossover with just one node does not contribute much but makes the algorithm more complicated
+            return
+
+        self_cut_index = random.randint(1, self.get_volume()-1)
+        other_cut_index = random.randint(1, other.get_volume()-1)
+
+        inserted_tree = other.cut_and_return_copy(other_cut_index)
+        self.insert_tree(self_cut_index, inserted_tree)

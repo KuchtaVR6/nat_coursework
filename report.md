@@ -135,8 +135,8 @@ This makes the mutations simple, as they could simply be based on bit flipping, 
 
 For this problem, the ranges for possible parameters have been constrained into the following ranges:
 - population_size from 100 to 400, with step 10 (i.e. 100, 110, 120..., 390, 400)
-- mutation_rate from 0.1 to 0.9, with step 0.9 (i.e. 0.1, 0.2, 0.3..., 0.8, 0.9)
-- crossover_rate from 0.1 to 0.9, with step 0.9 (i.e. 0.1, 0.2, 0.3..., 0.8, 0.9)
+- mutation_rate from 0.1 to 0.9, with step 0.1 (i.e. 0.1, 0.2, 0.3..., 0.8, 0.9)
+- crossover_rate from 0.1 to 0.9, with step 0.1 (i.e. 0.1, 0.2, 0.3..., 0.8, 0.9)
 
 For each pair of parameters, the genetic algorithm will be run for a number of iterations, until exhausting the given budget of evaluations, restarting after finding a correct solution or when the number of iterations goes above a 20. The final performance metric will be the number of times that the genetic algorithm has reached the correct solution.
 

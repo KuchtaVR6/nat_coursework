@@ -45,37 +45,39 @@ def search_for_good_params():
 
 '''subtask a'''
 
-# for dimensionality in range(2, 7):
-#     dim_game = SumpleteGame(dimensionality)
-#     dim_problemClass = SumpleteProblemSubtaskA(dim_game)
-#
-#     solutions_found = 0
-#
-#     for reset in range(0, 100):
-#         model = GeneticAlgorithmForVectorProblems(dim_problemClass, 300, 0.5, 0.5)
-#
-#         model.compute_n_generations(50)
-#
-#         if model.best_solution_ever[1] == 1:
-#             solutions_found += 1
-#
-#     print(f'{dimensionality}D:{solutions_found}')
-
-'''subtask b'''
-
 for dimensionality in range(2, 7):
     dim_game = SumpleteGame(dimensionality)
-    dim_problemClass = SumpleteProblem(dim_game)
+    dim_problemClass = SumpleteProblemSubtaskA(dim_game)
 
     solutions_found = 0
 
     for reset in range(0, 100):
-        model = GeneticAlgorithmForVectorProblems(dim_problemClass,
-                                                  150, 0.2, 0.8)
+        model = GeneticAlgorithmForVectorProblems(dim_problemClass, 350,
+                                                  0.5,
+                                                  0.9)
 
         model.compute_n_generations(100)
 
-        if dim_problemClass.check_if_correct_solution(model.best_solution_ever[0]):
+        if model.best_solution_ever[1] == 1:
             solutions_found += 1
 
     print(f'{dimensionality}D:{solutions_found}')
+
+'''subtask b'''
+
+# for dimensionality in range(2, 7):
+#     dim_game = SumpleteGame(dimensionality)
+#     dim_problemClass = SumpleteProblem(dim_game)
+#
+#     solutions_found = 0
+#
+#     for reset in range(0, 100):
+#         model = GeneticAlgorithmForVectorProblems(dim_problemClass,
+#                                                   150, 0.2, 0.8)
+#
+#         model.compute_n_generations(100)
+#
+#         if dim_problemClass.check_if_correct_solution(model.best_solution_ever[0]):
+#             solutions_found += 1
+#
+#     print(f'{dimensionality}D:{solutions_found}')
