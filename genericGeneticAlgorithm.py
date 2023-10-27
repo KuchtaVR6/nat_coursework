@@ -1,5 +1,6 @@
 import numpy as np
-
+import sys
+sys.path.append("/problemClass.py")
 from problemClass import ProblemWithMutationScheme
 
 
@@ -91,11 +92,18 @@ class GenericGeneticAlgorithm:
         return best_solution, self.problem.evaluate_fitness(best_solution)
 
     def compute_n_generations(self, number_of_generations: int, verbose=False):
-        for _ in range(number_of_generations):
+        for generation in range(number_of_generations):
             self.compute_generation()
             if verbose:
                 print('>>gen_' + str(self.generations_computed) + '_best_fit|'
                       + str(self.best_solution_currently()[1]))
+
+    def compute_until_fit(self, termination_max=300):
+        for generation in range(termination_max):
+            self.compute_generation()
+            if self.best_solution_ever[1] == 0:
+                return self.evaluations_performed
+        return -1
 
 
 

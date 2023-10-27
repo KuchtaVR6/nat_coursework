@@ -1,7 +1,6 @@
 from geneticProgrammingProblem import GeneticProgrammingProblem
 from geneticAlgorithmForGP import GeneticAlgorithmForGP
 
-
 def sum(x, y): return x + y
 
 
@@ -58,18 +57,37 @@ problem = GeneticProgrammingProblem(
     possible_functions_labels,
     possible_constants,
     3,
-    generate_data(20, max_input_length, sequence_name='perrin'),
+    generate_data(20, max_input_length, sequence_name='pell'),
     max_input_length)
 
+print("population;mutation_rate;crossover_rate;average_solution_cost;success_rate")
 
-algorithm = GeneticAlgorithmForGP(problem, 60, 0.2, 0.3)
+for population_size in range(1, 101, 10):
+    for mutation_prob_times_10 in range(1, 10):
+        mutation_prob = mutation_prob_times_10 / 10
+        for crossover_prob_times_10 in range(1, 10):
+            crossover_prob = crossover_prob_times_10 / 10
 
-print(algorithm.best_solution_ever[0], "\n", algorithm.best_solution_ever[1], "\n")
+            convergence_in = 0
+            trials_failed = 0
 
-algorithm.compute_n_generations(300)
+            for trials in range(0, 100):
+                algorithm = GeneticAlgorithmForGP(problem, population_size, mutation_prob, crossover_prob)
 
-print(algorithm.best_solution_ever[0], "\n", algorithm.best_solution_ever[1], "\n")
+                output = algorithm.compute_until_fit()
 
+                if output == -1:
+                    trials_failed += 1
+                else:
+                    convergence_in += output
+
+            successes = 100-trials_failed
+
+            if successes == 0:
+                print(f"{population_size};{mutation_prob};{crossover_prob};{0};{successes}")
+            else:
+                print(
+                    f"{population_size};{mutation_prob};{crossover_prob};{int(convergence_in / successes)};{successes}")
 
 
 
